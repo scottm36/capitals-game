@@ -40,3 +40,47 @@
 .read-the-docs {
   color: #888;
 }
+
+.game-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.game-grid {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+
+.column {
+  flex: 1;
+  max-width: 400px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-button {
+  padding: 10px;
+  color: black;
+  border: 1px solid black;
+  width: 100%;
+  background-color: white;
+  cursor: pointer;
+}
+
+.game-button.selected {
+  background-color: lightblue;
+}
+
+.game-button.incorrect {
+  background-color: red;
+}
+
+h2 {
+  text-align: center;
+}

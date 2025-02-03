@@ -1,151 +1,185 @@
 import { useState } from 'react'
 import './App.css'
 
-  // array of countries and capitals
-  const countriesAndCapitals = [
-    { country: 'United States', capital: 'Washington, D.C.' },
-    { country: 'Canada', capital: 'Ottawa' },
-    { country: 'United Kingdom', capital: 'London' },
-    { country: 'Australia', capital: 'Canberra' },
-    { country: 'New Zealand', capital: 'Wellington' },    
-    { country: 'France', capital: 'Paris' },
-    { country: 'Germany', capital: 'Berlin' },
-    { country: 'Italy', capital: 'Rome' },
-    { country: 'Spain', capital: 'Madrid' },
-    { country: 'Portugal', capital: 'Lisbon' },
-  ];
-  
-  // const countriesAndCapitals = [
-  //   { country: 'Japan', capital: 'Tokyo' },
-  //   { country: 'China', capital: 'Beijing' },
-  //   { country: 'Brazil', capital: 'Brasília' },
-  //   { country: 'Argentina', capital: 'Buenos Aires' },
-  //   { country: 'Chile', capital: 'Santiago' },
-  //   { country: 'South Africa', capital: 'Cape Town' },
-  //   { country: 'Egypt', capital: 'Cairo' },
-  //   { country: 'India', capital: 'New Delhi' },
-  //   { country: 'Russia', capital: 'Moscow' },
-  //   { country: 'South Korea', capital: 'Seoul' }, 
-  // ];
-  
-  const initialCountries = [
-    ...countriesAndCapitals.map((item) => item.country)
-  ].sort(() => Math.random() - 0.5)
-  
-  const initialCapitals = [
-    ...countriesAndCapitals.map((item) => item.capital)
-  ].sort(() => Math.random() - 0.5)
-  
-  function App() {
-  
-    const [gameStarted, setGameStarted] = useState(false);
-    const [matched, setMatched] = useState(false);
-    const [countries, setCountries] = useState<string[]>(initialCountries);
-    const [capitals, setCapitals] = useState<string[]>(initialCapitals);
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-    const [selectedCapital, setSelectedCapital] = useState<string | null>(null);
-  
-    const startGame = () => {
-      setGameStarted(true);
-    };
-  
-    const handleCountryClick = (country: string) => {  
-      setSelectedCountry(country);
-      checkAnswer();
-    };
-  
-    const handleCapitalClick = (capital: string) => {
-      setSelectedCapital(capital);
-      if (checkAnswer()) {
-      //   setMatched(true);
-      //   setCountries(countries.filter(c => c !== selectedCountry));
-      //   setCapitals(capitals.filter(c => c !== selectedCapital));
-      }
-      // setSelectedCapital(null);
-    };    
-  
-    const checkAnswer = () => {
-      let countriesLength = countries.length;
-      if(!selectedCountry || !selectedCapital)
-          return false;
-      if(selectedCapital === countriesAndCapitals
-          .find((item) => item.country === selectedCountry)?.capital) {
-        // remove both buttons
-        const newCountries = countries.filter((item) => {
-          if(item === selectedCountry) {
-            capitals.splice(capitals.indexOf(countriesAndCapitals.find((item) => item.country === selectedCountry)?.capital ?? ''), 1);
-            // remove matching country from array
-            countries.splice(countries.indexOf(selectedCountry), 1);  
-            return false;
-          }
-          return true;
-        })
-        if (newCountries.length < countriesLength) {  
-          setMatched(true);
-          setCountries(newCountries);
-          setCapitals(capitals.filter((item) => {
-              if(item === selectedCountry) {
-                capitals.splice(capitals.indexOf(countriesAndCapitals.find((item) => item.country === selectedCountry)?.capital ?? ''), 1);
-                // remove matching country from array
-                countries.splice(countries.indexOf(selectedCountry), 1);  
-                return false;
-              }   
-              return true;
-              })
-          );
-          return true;
-        }
-        setMatched(false);
-        return false;
-      //   setCountries(newCountries);
-      //   setSelectedCapital(capitals); 
-      } else {
-        setMatched(false);
-        setSelectedCountry(null);
-        setSelectedCapital(null);
-        return false;
-      }
-  
+// array of countries and capitals
+interface CountryItem {
+  name: string;
+  capital: string;
+  selected: boolean;
+  matched: boolean;
+}
+
+interface CapitalItem {
+  name: string;
+  country: string;
+  selected: boolean;
+  matched: boolean;
+}
+
+// const Game = () => {
+function App() {
+  const [countries, setCountries] = useState([
+    { name: 'United Kingdom', capital: 'London', selected: false, matched: false },
+    { name: 'United States', capital: 'Washington, D.C.', selected: false, matched: false },
+    { name: 'Italy', capital: 'Rome', selected: false, matched: false },
+    { name: 'Canada', capital: 'Ottawa', selected: false, matched: false },
+    { name: 'Portugal', capital: 'Lisbon', selected: false, matched: false },
+    { name: 'New Zealand', capital: 'Wellington', selected: false, matched: false },
+    { name: 'Australia', capital: 'Canberra', selected: false, matched: false },
+    { name: 'France', capital: 'Paris', selected: false, matched: false },
+    { name: 'Spain', capital: 'Madrid', selected: false, matched: false },
+    { name: 'Germany', capital: 'Berlin', selected: false, matched: false }
+  ]);
+
+  const [capitals, setCapitals] = useState([
+    { name: 'Washington, D.C.', country: 'United States', selected: false, matched: false },
+    { name: 'Rome', country: 'Italy', selected: false, matched: false },
+    { name: 'London', country: 'United Kingdom', selected: false, matched: false },
+    { name: 'Berlin', country: 'Germany', selected: false, matched: false },
+    { name: 'Lisbon', country: 'Portugal', selected: false, matched: false },
+    { name: 'Paris', country: 'France', selected: false, matched: false },
+    { name: 'Wellington', country: 'New Zealand', selected: false, matched: false },
+    { name: 'Canberra', country: 'Australia', selected: false, matched: false },
+    { name: 'Ottawa', country: 'Canada', selected: false, matched: false },
+    { name: 'Madrid', country: 'Spain', selected: false, matched: false }
+  ]);
+
+  const [selectedCountry, setSelectedCountry] = useState<CountryItem | null>(null);
+  const [selectedCapital, setSelectedCapital] = useState<CapitalItem | null>(null);
+
+  const resetSelections = () => {
+    setCountries(countries.map(c => ({ ...c, selected: false })));
+    setCapitals(capitals.map(c => ({ ...c, selected: false })));
+    setSelectedCountry(null);
+    setSelectedCapital(null);
+  };
+
+  // const initialCountries = [
+  //   ...countriesAndCapitals.map((item) => item.country)
+  // ].sort(() => Math.random() - 0.5)
+
+  // const initialCapitals = [
+  //   ...countriesAndCapitals.map((item) => item.capital)
+  // ].sort(() => Math.random() - 0.5)
+
+
+  const [gameStarted, setGameStarted] = useState(false);
+
+
+  const startGame = () => {
+    setGameStarted(true);
+  };
+
+  const handleCountryClick = (country: CountryItem) => {
+    // Reset any incorrect matches
+    if (selectedCountry && selectedCapital) {
+      resetSelections();
+      return;
     }
-    if (matched) {
-      setMatched(false);
+
+    setCountries(countries.map(c => ({
+      ...c,
+      selected: c.name === country.name
+    })));
+    setSelectedCountry(country);
+
+    // Check for match if a capital is already selected
+    if (selectedCapital) {
+      if (country.capital === selectedCapital.name) {
+        // Match found
+        setCountries(countries.map(c => ({
+          ...c,
+          matched: c.name === country.name ? true : c.matched
+        })));
+        setCapitals(capitals.map(c => ({
+          ...c,
+          matched: c.name === selectedCapital.name ? true : c.matched
+        })));
+        resetSelections();
+      }
     }
-  
-    return (
-      <>
-        {gameStarted ? (
-          <div>
-            <h1>Country Capital Game</h1>
-            <p>Match each country with its capital</p>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              padding: '1rem'
-            }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: '1rem',
-              }}>
-                {countries.map((item, index) => (
-                  <>
-                  <button style={{backgroundColor: selectedCountry === item ? 'blue' : 'black'}} 
-                      onClick={() => handleCountryClick(item)} key={item}>{item}</button>
-                  <button style={{backgroundColor: selectedCapital === capitals[index] ? 'blue' : 'black'}} 
-                      onClick={() => handleCapitalClick(capitals[index])} key={capitals[index]}>{capitals[index]}</button>
-                  </>
+  };
+
+  const handleCapitalClick = (capital: CapitalItem) => {
+    // Reset any incorrect matches
+    if (selectedCountry && selectedCapital) {
+      resetSelections();
+      return;
+    }
+
+    setCapitals(capitals.map(c => ({
+      ...c,
+      selected: c.name === capital.name
+    })));
+    setSelectedCapital(capital);
+
+    // Check for match if a country is already selected
+    if (selectedCountry) {
+      if (selectedCountry.capital === capital.name) {
+        // Match found
+        setCountries(countries.map(c => ({
+          ...c,
+          matched: c.name === selectedCountry.name ? true : c.matched
+        })));
+        setCapitals(capitals.map(c => ({
+          ...c,
+          matched: c.name === capital.name ? true : c.matched
+        })));
+        resetSelections();
+      }
+    }
+  };
+
+  return (
+    <>
+      {gameStarted ? (
+        <div className="game-container">
+          <h1>Country Capital Game</h1>
+          <p>Match each country with its capital</p>
+          <div className="game-grid">
+            <div className="column">
+              <h2>Countries</h2>
+              <div className="button-container">
+                {countries.map((country) => (
+                  !country.matched && (
+                    <button
+                      key={country.name}
+                      className={`game-button ${country.selected ? 'selected' : ''} 
+                        ${selectedCountry?.name === country.name && selectedCapital && 
+                        country.capital !== selectedCapital.name ? 'incorrect' : ''}`}
+                      onClick={() => handleCountryClick(country)}
+                    >
+                      {country.name}
+                    </button>
+                  )
+                ))}
+              </div>
+            </div>
+            <div className="column">
+              <h2>Capitals</h2>
+              <div className="button-container">
+                {capitals.map((capital) => (
+                  !capital.matched && (
+                    <button
+                      key={capital.name}
+                      className={`game-button ${capital.selected ? 'selected' : ''} 
+                        ${selectedCapital?.name === capital.name && selectedCountry && 
+                        selectedCountry.capital !== capital.name ? 'incorrect' : ''}`}
+                      onClick={() => handleCapitalClick(capital)}
+                    >
+                      {capital.name}
+                    </button>
+                  )
                 ))}
               </div>
             </div>
           </div>
-        ) : (
-          <button onClick={startGame}>
-            Start Game
-          </button>           
-        )}
-      </>
-    )
-  }
-  
+        </div>
+      ) : (
+        <button onClick={startGame}>Start Game</button>
+      )}
+    </>
+  );
+}
+
 export default App
