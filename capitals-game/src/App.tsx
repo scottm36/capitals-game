@@ -48,6 +48,7 @@ function App() {
   const [selectedCapital, setSelectedCapital] = useState<CapitalItem | null>(null);
 
   const resetSelections = () => {
+    // Only reset selected state, preserve matched state
     setCountries(countries.map(c => ({ ...c, selected: false })));
     setCapitals(capitals.map(c => ({ ...c, selected: false })));
     setSelectedCountry(null);
@@ -71,6 +72,9 @@ function App() {
   };
 
   const handleCountryClick = (country: CountryItem) => {
+    // Don't allow clicking on already matched items
+    if (country.matched) return;
+
     // Reset any incorrect matches
     if (selectedCountry && selectedCapital) {
       resetSelections();
@@ -79,7 +83,7 @@ function App() {
 
     setCountries(countries.map(c => ({
       ...c,
-      selected: c.name === country.name
+      selected: c.name === country.name ? true : false
     })));
     setSelectedCountry(country);
 
@@ -89,20 +93,24 @@ function App() {
         // Match found
         setCountries(countries.map(c => ({
           ...c,
-          matched: c.name === country.name
+          matched: c.name === country.name ? true : c.matched,
+          selected: false
         })));
         setCapitals(capitals.map(c => ({
           ...c,
-          matched: c.name === selectedCapital.name
+          matched: c.name === selectedCapital.name ? true : c.matched,
+          selected: false
         })));
-        resetSelections();
+        setSelectedCountry(null);
+        setSelectedCapital(null);
       }
     }
-    console.log(countries);
-    console.log(capitals);
   };
 
   const handleCapitalClick = (capital: CapitalItem) => {
+    // Don't allow clicking on already matched items
+    if (capital.matched) return;
+
     // Reset any incorrect matches
     if (selectedCountry && selectedCapital) {
       resetSelections();
@@ -111,26 +119,26 @@ function App() {
 
     setCapitals(capitals.map(c => ({
       ...c,
-      selected: c.name === capital.name
+      selected: c.name === capital.name ? true : false
     })));
     setSelectedCapital(capital);
 
     // Check for match if a country is already selected
     if (selectedCountry) {
-      console.log(selectedCountry.capital)
-      console.log(capital.name); 
       if (selectedCountry.capital === capital.name) {
         // Match found
         setCountries(countries.map(c => ({
           ...c,
-          matched: true //c.name === selectedCountry.name
+          matched: c.name === selectedCountry.name ? true : c.matched,
+          selected: false
         })));
-        // debugger
         setCapitals(capitals.map(c => ({
-          ...c, 
-          matched: true //c.name === capital.name
+          ...c,
+          matched: c.name === capital.name ? true : c.matched,
+          selected: false
         })));
-        resetSelections();
+        setSelectedCountry(null);
+        setSelectedCapital(null);
       }
     }
   };
@@ -145,9 +153,9 @@ function App() {
             <div className="column">
               <h2>Countries</h2>
               <div className="button-container">
-                {countries.map((country) => (
-                  console.dir(country),
-                  !country.matched && (
+                {countries
+                  .filter(country => !country.matched)
+                  .map((country) => (
                     <button
                       key={country.name}
                       className={`game-button ${country.selected ? 'selected' : ''} 
@@ -158,14 +166,15 @@ function App() {
                       {country.name}
                     </button>
                   )
-                ))}
+                )}
               </div>
             </div>
             <div className="column">
               <h2>Capitals</h2>
               <div className="button-container">
-                {capitals.map((capital) => (
-                  !capital.matched && (
+                {capitals
+                  .filter(capital => !capital.matched)
+                  .map((capital) => (
                     <button
                       key={capital.name}
                       className={`game-button ${capital.selected ? 'selected' : ''} 
@@ -176,7 +185,7 @@ function App() {
                       {capital.name}
                     </button>
                   )
-                ))}
+                )}
               </div>
             </div>
           </div>
