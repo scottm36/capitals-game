@@ -143,12 +143,22 @@ function App() {
     }
   };
 
+  // Add check for game completion
+  const allMatched = countries.every(country => country.matched);
+
   return (
     <>
       {gameStarted ? (
         <div className="game-container">
           <h1>Country Capital Game</h1>
-          <p>Match each country with its capital</p>
+          {allMatched ? (
+            <>
+            <h2>Congratulations! You've matched all countries with their capitals!</h2>
+            <button onClick={startGame}>Play Again</button>
+            </>
+          ) : (
+            <p>Match each country with its capital</p>
+          )}
           <div className="game-grid">
             <div className="column">
               <h2>Countries</h2>
