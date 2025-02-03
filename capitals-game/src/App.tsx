@@ -89,15 +89,17 @@ function App() {
         // Match found
         setCountries(countries.map(c => ({
           ...c,
-          matched: c.name === country.name ? true : c.matched
+          matched: c.name === country.name
         })));
         setCapitals(capitals.map(c => ({
           ...c,
-          matched: c.name === selectedCapital.name ? true : c.matched
+          matched: c.name === selectedCapital.name
         })));
         resetSelections();
       }
     }
+    console.log(countries);
+    console.log(capitals);
   };
 
   const handleCapitalClick = (capital: CapitalItem) => {
@@ -115,15 +117,18 @@ function App() {
 
     // Check for match if a country is already selected
     if (selectedCountry) {
+      console.log(selectedCountry.capital)
+      console.log(capital.name); 
       if (selectedCountry.capital === capital.name) {
         // Match found
         setCountries(countries.map(c => ({
           ...c,
-          matched: c.name === selectedCountry.name ? true : c.matched
+          matched: true //c.name === selectedCountry.name
         })));
+        // debugger
         setCapitals(capitals.map(c => ({
-          ...c,
-          matched: c.name === capital.name ? true : c.matched
+          ...c, 
+          matched: true //c.name === capital.name
         })));
         resetSelections();
       }
@@ -141,6 +146,7 @@ function App() {
               <h2>Countries</h2>
               <div className="button-container">
                 {countries.map((country) => (
+                  console.dir(country),
                   !country.matched && (
                     <button
                       key={country.name}
